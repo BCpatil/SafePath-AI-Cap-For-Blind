@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SafePath AI - Guardian Remote Monitoring Portal</title>
+  
+  <!-- Leaflet Map CSS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <!-- Google Fonts & Font Awesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app-container">
+    <!-- Top Navigation Header -->
+    <header class="app-header">
+      <div class="brand">
+        <div class="brand-icon"><i class="fa-solid fa-person-walking-with-cane"></i></div>
+        <div>
+          <h1>SafePath AI</h1>
+          <p class="tagline">Guardian & Caregiver Emergency Monitoring System</p>
+        </div>
+      </div>
+      <div class="header-status">
+        <span class="status-badge" id="brokerStatusBadge">
+          <span class="dot"></span> <span id="brokerStatusText">Connecting to Cloud...</span>
+        </span>
+        <span class="device-pill" id="deviceIdPill">
+          <i class="fa-solid fa-microchip"></i> <span id="lblDeviceId">SAFEPATH_CAP_001</span>
+        </span>
+      </div>
+    </header>
+
+    <!-- Emergency SOS Alert Banner (Visible when SOS triggered) -->
+    <div class="sos-banner" id="sosAlertBanner" style="display: none;">
+      <div class="sos-content">
+        <div class="sos-icon-pulse"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        <div class="sos-details">
+          <h2>EMERGENCY HELP REQUESTED!</h2>
+          <p id="sosMessageText">The wearer pressed the emergency assistance button.</p>
+          <div class="sos-meta">
+            <span id="sosTimestamp"><i class="fa-regular fa-clock"></i> Just now</span>
+            <span id="sosCoords"><i class="fa-solid fa-location-dot"></i> Lat: 12.9716, Lon: 77.5946</span>
+          </div>
+        </div>
+        <div class="sos-actions">
+          <a href="#" target="_blank" id="btnGoogleMaps" class="btn btn-primary">
+            <i class="fa-solid fa-map-location-dot"></i> Open Google Maps
+          </a>
+          <button id="btnDismissSos" class="btn btn-secondary">
+            <i class="fa-solid fa-check"></i> Acknowledge Alert
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Dashboard Grid -->
+    <main class="dashboard-grid">
+      <!-- Left Column: Metrics & Controls -->
+      <section class="metrics-column">
+        <!-- Live Status Card -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-signal"></i> Device Telemetry</h3>
+            <span class="badge badge-success" id="deviceStateBadge">ACTIVE</span>
+          </div>
+          <div class="metrics-grid">
+            <div class="metric-box">
+              <span class="metric-label">Operating Mode</span>
+              <span class="metric-val" id="metricMode">OBSTACLE</span>
+              <span class="metric-sub" id="metricModeSub">Spatial Partitioning</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-label">Sonar Distance</span>
+              <span class="metric-val" id="metricDistance">-- cm</span>
+              <span class="metric-sub" id="metricDistanceSub">Front Path Clear</span>
+            </div>
+            <div class="metric-box">
+              <span class="metric-label">Battery Level</span>
+              <span class="metric-val" id="metricBattery">88%</span>
+              <div class="progress-bar"><div class="progress-fill" style="width: 88%;"></div></div>
+            </div>
+            <div class="metric-box">
+              <span class="metric-label">GPS Satellites</span>
+              <span class="metric-val" id="metricSats"><i class="fa-solid fa-satellite"></i> 7 Sats</span>
+              <span class="metric-sub" id="metricGpsFix">3D Precision Fix</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Simulated Controls Card (For Guardian testing & remote ping) -->
+        <div class="card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-sliders"></i> Remote Guardian Actions</h3>
+          </div>
+          <div class="actions-list">
+            <button class="btn btn-danger btn-block" id="btnSimulateSos">
+              <i class="fa-solid fa-bell"></i> Test Trigger SOS Emergency
+            </button>
+            <button class="btn btn-outline btn-block" id="btnCenterMap">
+              <i class="fa-solid fa-crosshairs"></i> Center On Wearer's Location
+            </button>
+          </div>
+        </div>
+
+        <!-- Incident History Log -->
+        <div class="card log-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-clock-rotate-left"></i> Real-time Incident Log</h3>
+          </div>
+          <div class="log-container" id="logContainer">
+            <div class="log-item">
+              <span class="log-time">System</span>
+              <span class="log-text">Guardian Dashboard initialized and waiting for MQTT stream.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right Column: Interactive Map -->
+      <section class="map-column">
+        <div class="card map-card">
+          <div class="card-header">
+            <h3><i class="fa-solid fa-location-dot"></i> Live GPS Positioning (u-blox NEO-7M)</h3>
+            <span class="coords-display" id="coordsDisplay">12.971598, 77.594566</span>
+          </div>
+          <div id="liveMap" class="map-view"></div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Leaflet JS & Paho MQTT Library -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

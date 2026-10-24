@@ -1,0 +1,16 @@
+Board,Pin_Name,BCM_GPIO,Connected_Device,Device_Pin,Signal_Type,Notes
+Raspberry_Pi_5,Pin_1,3V3,NEO-7M_GPS,VCC,Power,3.3V power rail
+Raspberry_Pi_5,Pin_2,5V,HC-SR04,VCC,Power,5V power rail
+Raspberry_Pi_5,Pin_6,GND,Common,GND,Ground,Common circuit ground
+Raspberry_Pi_5,Pin_8,GPIO_14,NEO-7M_GPS,RXD,UART_TX,Transmit to GPS
+Raspberry_Pi_5,Pin_10,GPIO_15,NEO-7M_GPS,TXD,UART_RX,Receive NMEA strings at 9600 baud
+Raspberry_Pi_5,Pin_11,GPIO_17,Mode_Button,Terminal_1,Digital_In,Pull-up enabled; triggers mode cycle
+Raspberry_Pi_5,Pin_13,GPIO_27,SOS_Button,Terminal_1,Digital_In,Pull-up enabled; triggers emergency MQTT
+Raspberry_Pi_5,Pin_16,GPIO_23,HC-SR04,TRIG,Digital_Out,10us ultrasonic pulse
+Raspberry_Pi_5,Pin_18,GPIO_24,HC-SR04,ECHO,Digital_In,Requires 1k/2k voltage divider (5V to 3.3V)
+NodeMCU_ESP8266,D1,GPIO_5,Sonar_Center,TRIG,Digital_Out,Offloaded center sonar trigger
+NodeMCU_ESP8266,D2,GPIO_4,Sonar_Center,ECHO,Digital_In,Offloaded center sonar echo
+NodeMCU_ESP8266,D5,GPIO_14,Sonar_Left,TRIG,Digital_Out,Auxiliary left sonar trigger
+NodeMCU_ESP8266,D6,GPIO_12,Sonar_Left,ECHO,Digital_In,Auxiliary left sonar echo
+NodeMCU_ESP8266,D7,GPIO_13,Sonar_Right,TRIG,Digital_Out,Auxiliary right sonar trigger
+NodeMCU_ESP8266,D8,GPIO_15,Sonar_Right,ECHO,Digital_In,Auxiliary right sonar echo
